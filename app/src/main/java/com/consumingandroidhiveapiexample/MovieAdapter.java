@@ -1,12 +1,14 @@
 package com.consumingandroidhiveapiexample;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.RatingBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
@@ -20,10 +22,12 @@ public class MovieAdapter extends BaseAdapter {
     private LayoutInflater inflater;
     private List<MovieModel> movielist;
     MovieModel m;
+    Context context;
     ImageLoader imageLoader = VollySingleton.getInstance().getImageLoader();
 
     public MovieAdapter(Context ctx, List<MovieModel> list) {
         inflater = LayoutInflater.from(ctx);
+        context = ctx;
         movielist = list;
 
 
@@ -45,7 +49,7 @@ public class MovieAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder = null;
         if (convertView == null) {
             viewHolder = new ViewHolder();
@@ -63,7 +67,7 @@ public class MovieAdapter extends BaseAdapter {
         viewHolder.iv_image.setImageUrl(movielist.get(position).getImage(), imageLoader);
         viewHolder.tvMovieName.setText(movielist.get(position).getTitle());
         viewHolder.tvRating.setText("Rating : " + movielist.get(position).getRating());
-        viewHolder.tvYear.setText("Year : "+movielist.get(position).getReleaseYear());
+        viewHolder.tvYear.setText("Year : " + movielist.get(position).getReleaseYear());
 
         // genre
         m = movielist.get(position);
@@ -73,8 +77,19 @@ public class MovieAdapter extends BaseAdapter {
         }
         genreStr = genreStr.length() > 0 ? genreStr.substring(0,
                 genreStr.length() - 2) : genreStr;
-        viewHolder.tvCarg.setText("Carg : "+genreStr);
-
+        viewHolder.tvCarg.setText("Carg : " + genreStr);
+        convertView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(context, DetailActivity.class);
+                i.putExtra("movieName",movielist.get(position).getTitle());
+                i.putExtra("Rating",movielist.get(position).getRating());
+                i.putExtra("Year",movielist.get(position).getReleaseYear());
+                i.putExtra("imageUrl",movielist.get(position).getImage());
+                context.startActivity(i);
+                //Toast.makeText(context, "" + movielist.get(position).getTitle(), Toast.LENGTH_LONG).show();
+            }
+        });
 
         return convertView;
     }
